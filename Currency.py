@@ -12,6 +12,7 @@
 
 class Currency():
 
+    # Initialize the instance of the Currency object with 0's or with input
     def __init__(self, platinum=0, gold=0, electrum=0, silver=0, copper=0):
         self.platinum = platinum
         self.gold = gold
@@ -21,41 +22,41 @@ class Currency():
 
     @property
     def platinum(self):
-        return self._platinum
+        return self._platinum # Get number of Platinum coins
 
     @platinum.setter
     def platinum(self, platinum):
-        self._platinum = platinum
+        self._platinum = platinum # Set number of Platinum coins
     
     @property
     def gold(self):
-        return self._gold
+        return self._gold # Get number of Gold coins
 
     @gold.setter
     def gold(self, gold):
-        self._gold = gold
+        self._gold = gold # Set number of Gold coins
 
     @property
     def electrum(self):
-        return self._electrum
+        return self._electrum # Get number of Electrum coins
 
     @electrum.setter
     def electrum(self, electrum):
-        self._electrum = electrum
+        self._electrum = electrum  # Set number of Electrum coins
     
     @property
     def silver(self):
-        return self._silver
+        return self._silver # Get number of Silver coins
 
     @silver.setter
     def silver(self, silver):
-        self._silver = silver
+        self._silver = silver # Set number of Silver coins
         
     @property
     def copper(self):
-        return self._copper
+        return self._copper # Get number of Copper coins
 
     @copper.setter
     def copper(self, copper):
-        self._copper = copper
+        self._copper = copper # Set number of Copper coins
 
