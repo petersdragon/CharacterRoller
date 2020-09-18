@@ -10,7 +10,6 @@
 # Dexterity, Constitution, Intelligence,
 # Wisdom, and Charisma.
 # ---------------------------------------
-
 class Attributes():
 
     # Initialize the instance of the Attributes object with 0's or with input
