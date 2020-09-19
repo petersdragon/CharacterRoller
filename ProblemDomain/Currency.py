@@ -1,10 +1,12 @@
-
 from Coin import Coin
+from MyExceptions.CannotConvertHeaviestCoinUpException import CannotConvertHeaviestCoinUpException
+from MyExceptions.ConversionQuantityInvalidException import ConversionQuantityInvalidException
+from MyExceptions.CoinNameDoesNotExistException import CoinNameDoesNotExistException
 
 # ---------------------------------------
 # Author: Peter Moyer & Nathaniel Markham
 # Date Written: 17092020
-# Date Modified: 17092020
+# Date Modified: 18092020
 # ---------------------------------------
 # Currency
 # 
@@ -21,65 +23,71 @@ class Currency():
     platinumWeight = 1000   # Number of copper in a platinum
 
     # Initialize the instance of the Currency object with 0's or with input
-    def __init__(self, platinum=0, gold=0, electrum=0, silver=0, copper=0):
+    def __init__(self, platinumQuantity=0, goldQuantity=0, electrumQuantity=0, silverQuantity=0, copperQuantity=0):
         self.coins = [
-            Coin("Copper", self.copperWeight, copper),
-            Coin("Silver", self.silverWeight, silver),
-            Coin("Electrum", self.electrumWeight, electrum),
-            Coin("Gold", self.goldWeight, gold),
-            Coin("Platinum", self.platinumWeight, platinum)
+            Coin("Copper", self.copperWeight, copperQuantity),
+            Coin("Silver", self.silverWeight, silverQuantity),
+            Coin("Electrum", self.electrumWeight, electrumQuantity),
+            Coin("Gold", self.goldWeight, goldQuantity),
+            Coin("Platinum", self.platinumWeight, platinumQuantity)
         ] # Make sure the elements are in order by weights, with the heaviest being the last element of the list
 
-    # Converts each coin to the highest size it can be
-    def convertToHighest(self):
-        for coin in self.coins:
-            self.convertUp(coin)
-
-    # Convert as many of the fromCoin to the next coin up
-    def convertUp(self, fromCoin):
-        if fromCoin != self.coins[-1]: # Make sure it is not the heaviest coin being converted up
-            self.convertFromCoinToCoin(fromCoin, self.coins[self.coins.index(fromCoin)+1])
-
-        else:
-            # Cannot convert highest weighted coin up
-            pass
-
-    # Convert fromCoinQuantity number of fromCoin to the next highest coin size
-    def convertUpByQuantity(self, fromCoin, fromCoinQuantity):
-        # Check that Platinum is not being converted up.
-        pass
-
-    # Convert as many of fromCoin to toCoin as possible
-    def convertFromCoinToCoin(self, fromCoin, toCoin):
-        temp = (fromCoin.quantity * fromCoin.weight) // toCoin.weight
-        toCoin.quantity += temp
-        fromCoin.quantity -= temp*fromCoin.weight
-    
-
-    def convertFromCoinToCoinByQuantity(self, fromCoin, toCoin, fromCoinQuantity):
-        # Convert fromCoinQuantity of fromCoin to toCoin
-        pass
-
-    def convertCoins(self, fromCoin = None, toCoin = None, fromCoinQuantity = None):
+    def convertCoins(self, fromCoinName = None, toCoinName = None, fromCoinQuantity = None):
         # Save current coin quantities so that the conversion can be reversed if a mistake is made?
-        if (fromCoin == None):
-            self.convertToHighest()
+        fromCoin = None # To make sure fromCoin will have a value
+        toCoin = None   # To make sure toCoin will have a value
+        
+        try:
+            if fromCoinName != None:
+                fromCoin = [x for x in self.coins if x.name == fromCoinName][0] # Find the element in the Coins list that matches the fromCoinName and store the whole Coin in fromCoin
+        
+            if toCoinName != None:
+                toCoin = [x for x in self.coins if x.name == toCoinName][0] # Find the element in the Coins list that matches the toCoinName and store the whole Coin in toCoin
+        
+        except IndexError:
+            raise CoinNameDoesNotExistException("The entered name is not a recognized Coin type.\n")
 
+        if (fromCoin == None):
+           for coin in self.coins:
+                self.convertFromCoinToCoinByQuantity(coin, self.coins[self.coins.index(coin)+1], coin.quantity) # Convert as many as possible of each coin to the next heaviest coin, starting with the lightest coin
         else:
             if (toCoin == None) and (fromCoinQuantity == None):
-                self.convertUp(fromCoin)
+                self.convertUpByQuantity(fromCoin, fromCoin.quantity) # Convert as many of the fromCoin to the next heaviest coin
 
             elif (toCoin == None) and (fromCoinQuantity != None):
-                self.convertUpByQuantity(fromCoin, fromCoinQuantity)
+                self.convertUpByQuantity(fromCoin, fromCoinQuantity) # Convert fromCoinQuantity of fromCoin to the next heaviest coin
 
             elif (toCoin != None) and (fromCoinQuantity == None):
-                self.convertFromCoinToCoin(fromCoin, toCoin)
+                self.convertFromCoinToCoinByQuantity(fromCoin, toCoin, fromCoin.quantity) # Convert as many of fromCoin to toCoin as possible
 
             else:
-                self.convertFromCoinToCoinByQuantity(fromCoin, toCoin, fromCoinQuantity)
+                self.convertFromCoinToCoinByQuantity(fromCoin, toCoin, fromCoinQuantity) # Convert fromCoinQuantity of fromCoin to toCoin
 
-        # Display message about which path was executed
+    # Convert fromCoinQuantity number of fromCoin to the next heaviest coin
+    def convertUpByQuantity(self, fromCoin, fromCoinQuantity):
+        if fromCoin == self.coins[-1]: # If the coin to convertUp is the heaviest coin
+            raise CannotConvertHeaviestCoinUpException("Cannot convert " + fromCoin.name + " to the next coin size up. It is the largest coin.\n")
 
+        else:
+            self.convertFromCoinToCoinByQuantity(fromCoin, self.coins[self.coins.index(fromCoin)+1], fromCoinQuantity)            
+
+    # Convert fromCoinQuantity of fromCoin to toCoin
+    def convertFromCoinToCoinByQuantity(self, fromCoin, toCoin, fromCoinQuantity):
+        if fromCoinQuantity > fromCoin.quantity: # Check to make sure fromCoinQuantity does not exceed fromCoin.quantity
+            raise ConversionQuantityInvalidException("Cannot convert that quantity of " + fromCoin.name + ". Value exceeds coin number or is negative.\n")
+        
+        else:
+            temp = (fromCoinQuantity * fromCoin.weight) // toCoin.weight
+            toCoin.quantity += temp
+            fromCoin.quantity -= temp
+
+    # Define a custom string representation for a Currency
+    def __str__(self):
+        return "\n".join(str(x) for x in self.coins)
+
+# Could replace these with a pair of more general functions.
+# One that takes a name, searches the list and finds the matching coin, and sets the quantity of coins to the specified amount.
+# The other takes a name, searches the list and finds the matching coin, and returns the quantity of coins.
     @property
     def platinum(self):
         return self._platinum # Get number of Platinum coins
@@ -119,4 +127,3 @@ class Currency():
     @copper.setter
     def copper(self, copper):
         self._copper = copper # Set number of Copper coins
-

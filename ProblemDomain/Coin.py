@@ -1,7 +1,7 @@
 # ---------------------------------------
 # Author: Peter Moyer
 # Date Written: 17092020
-# Date Modified: 17092020
+# Date Modified: 18092020
 # ---------------------------------------
 # Coin
 # 
@@ -14,6 +14,10 @@ class Coin():
         self.name = name
         self.weight = weight
         self.quantity = quantity
+
+    # Define a custom string representation for a Coin
+    def __str__(self):
+        return self.quantity + " " + self.name
 
     @property
     def name(self):

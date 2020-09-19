@@ -13,7 +13,7 @@
 class Attributes():
 
     # Initialize the instance of the Attributes object with 0's or with input
-    def __init__(self, strength=0, dexterity=0, constitution=0, intelligence=0, wisdom=0, charisma=0):
+    def __init__(self, strength = 0, dexterity = 0, constitution = 0, intelligence = 0, wisdom = 0, charisma = 0):
         self.strength = strength
         self.dexterity = dexterity
         self.constitution = constitution
